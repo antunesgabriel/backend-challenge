@@ -1,16 +1,16 @@
-FROM node:lts-alpine As development
+FROM node:12.20-alpine As development
 
 WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install --only=development
+RUN npm i
 
 COPY . .
 
-RUN npm run build
+EXPOSE 3000
 
-FROM node:lts-alpine as production
+FROM node:12.20-alpine as production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
@@ -19,11 +19,11 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install --only=production
+RUN npm i
 
 COPY . .
 
-COPY --from=development /usr/src/app/dist ./dist
+RUN npm run build
 
 CMD ["node", "dist/main"]
 EXPOSE 3000
