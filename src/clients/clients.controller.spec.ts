@@ -154,13 +154,11 @@ describe('ClientsController', () => {
     it('should be returns client fail if service throw', async () => {
       service.findOne = jest
         .fn()
-        .mockRejectedValue(new InternalServerErrorException());
+        .mockRejectedValue(new BadRequestException('Client not exist'));
 
       const id = faker.datatype.number().toString();
 
-      const response = await controller.findOne(id);
-
-      await expect(response).toEqual(
+      await expect(controller.findOne(id)).rejects.toThrow(
         new BadRequestException('Client not exist'),
       );
     });
@@ -193,11 +191,13 @@ describe('ClientsController', () => {
         .fn()
         .mockRejectedValue(new InternalServerErrorException());
 
-      const invalidParams: any = {};
+      const id = faker.datatype.number().toString();
 
-      const response = await controller.update(invalidParams, invalidParams);
+      const mockData = mockUpdateClientDto();
 
-      await expect(response).toEqual(
+      const response = await controller.update(id, mockData);
+
+      expect(response).toEqual(
         new InternalServerErrorException(
           'Sorry, it was not possible to perform this task',
         ),

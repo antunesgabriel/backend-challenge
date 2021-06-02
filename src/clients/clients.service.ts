@@ -17,7 +17,7 @@ export class ClientsService {
     private readonly clientsRepository: ClientsRepository,
   ) {}
 
-  async create(createClientDto: CreateClientDto): Promise<Client> {
+  async create(createClientDto: CreateClientDto): Promise<any> {
     if (!emailIsValid(createClientDto.email)) {
       throw new BadRequestException({ message: 'Invalid email' });
     }

@@ -26,8 +26,8 @@ export class ProductsController extends BaseController {
       const data = await this.productsService.create(createProductDto);
 
       return this.sucessResponse(data, 'Created!');
-    } catch (_) {
-      return this.errorResponse();
+    } catch (err) {
+      return this.errorResponse(err);
     }
   }
 
@@ -37,8 +37,8 @@ export class ProductsController extends BaseController {
       const data = await this.productsService.findAll();
 
       return this.sucessResponse(data);
-    } catch (_) {
-      return this.errorResponse();
+    } catch (err) {
+      return this.errorResponse(err);
     }
   }
 
@@ -48,8 +48,8 @@ export class ProductsController extends BaseController {
       const data = await this.productsService.findOne(+id);
 
       return this.sucessResponse(data);
-    } catch (_) {
-      return this.errorResponse('Product not exist', 404);
+    } catch (err) {
+      return this.errorResponse(err);
     }
   }
 
@@ -63,8 +63,8 @@ export class ProductsController extends BaseController {
       const data = await this.productsService.update(+id, updateProductDto);
 
       return this.sucessResponse(data, 'Updated!');
-    } catch (_) {
-      return this.errorResponse();
+    } catch (err) {
+      return this.errorResponse(err);
     }
   }
 
@@ -75,7 +75,7 @@ export class ProductsController extends BaseController {
 
       return this.sucessResponse(data, 'Deleted!');
     } catch (err) {
-      return this.errorResponse();
+      return this.errorResponse(err);
     }
   }
 }

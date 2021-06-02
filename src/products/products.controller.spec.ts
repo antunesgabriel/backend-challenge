@@ -83,11 +83,9 @@ describe('ProductsController', () => {
         .fn()
         .mockRejectedValue(new InternalServerErrorException());
 
-      const mockCreateInvalidDto: any = {};
+      const mockCreateInvalidDto = mockCreateProductDto();
 
-      const response = await controller.create(mockCreateInvalidDto);
-
-      await expect(response).toEqual(
+      expect(await controller.create(mockCreateInvalidDto)).toEqual(
         new InternalServerErrorException(
           'Sorry, it was not possible to perform this task',
         ),
@@ -163,8 +161,10 @@ describe('ProductsController', () => {
 
       const response = await controller.findOne(id);
 
-      await expect(response).toEqual(
-        new BadRequestException('Product not exist'),
+      expect(response).toEqual(
+        new InternalServerErrorException(
+          'Sorry, it was not possible to perform this task',
+        ),
       );
     });
 

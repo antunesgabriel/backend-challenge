@@ -26,8 +26,8 @@ export class ClientsController extends BaseController {
       const data = await this.clientsService.create(createClientDto);
 
       return this.sucessResponse(data, 'Created!');
-    } catch (_) {
-      return this.errorResponse();
+    } catch (err) {
+      return this.errorResponse(err);
     }
   }
 
@@ -37,20 +37,16 @@ export class ClientsController extends BaseController {
       const data = await this.clientsService.findAll();
 
       return this.sucessResponse(data);
-    } catch (_) {
-      return this.errorResponse();
+    } catch (err) {
+      return this.errorResponse(err);
     }
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    try {
-      const data = await this.clientsService.findOne(+id);
+    const data = await this.clientsService.findOne(+id);
 
-      return this.sucessResponse(data);
-    } catch (_) {
-      return this.errorResponse('Client not exist', 404);
-    }
+    return this.sucessResponse(data);
   }
 
   @Put(':id')
@@ -63,8 +59,8 @@ export class ClientsController extends BaseController {
       const data = await this.clientsService.update(+id, updateClientDto);
 
       return this.sucessResponse(data, 'Updated!');
-    } catch (_) {
-      return this.errorResponse();
+    } catch (err) {
+      return this.errorResponse(err);
     }
   }
 
@@ -75,7 +71,7 @@ export class ClientsController extends BaseController {
 
       return this.sucessResponse(data, 'Deleted!');
     } catch (err) {
-      return this.errorResponse();
+      return this.errorResponse(err);
     }
   }
 }
