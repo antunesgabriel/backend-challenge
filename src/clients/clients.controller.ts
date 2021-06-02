@@ -47,7 +47,7 @@ export class ClientsController extends BaseController {
 
       return this.sucessResponse(data);
     } catch (_) {
-      return this.errorResponse('Client not found', 404);
+      return this.errorResponse('Client not exist', 404);
     }
   }
 

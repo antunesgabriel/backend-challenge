@@ -161,7 +161,7 @@ describe('ClientsController', () => {
       const response = await controller.findOne(id);
 
       await expect(response).toEqual(
-        new BadRequestException('Client not found'),
+        new BadRequestException('Client not exist'),
       );
     });
 
