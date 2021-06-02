@@ -1,6 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateResult } from 'typeorm';
+import * as cpf from '@fnando/cpf';
+
+import { emailIsValid } from '../shared/validators/email.validation';
+
 import { ClientsRepository } from './clients.repository';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
@@ -14,6 +18,14 @@ export class ClientsService {
   ) {}
 
   async create(createClientDto: CreateClientDto): Promise<Client> {
+    if (!emailIsValid(createClientDto.email)) {
+      throw new BadRequestException({ message: 'Invalid email' });
+    }
+
+    if (!cpf.isValid(createClientDto.document)) {
+      throw new BadRequestException({ message: 'Invalid document' });
+    }
+
     return await this.clientsRepository.createClient(createClientDto);
   }
 
@@ -29,6 +41,14 @@ export class ClientsService {
     id: number,
     updateClientDto: UpdateClientDto,
   ): Promise<UpdateResult> {
+    if (updateClientDto.email && !emailIsValid(updateClientDto.email)) {
+      throw new BadRequestException({ message: 'Invalid email' });
+    }
+
+    if (updateClientDto.document && !cpf.isValid(updateClientDto.document)) {
+      throw new BadRequestException({ message: 'Invalid document' });
+    }
+
     return await this.clientsRepository.update(id, updateClientDto);
   }
 
