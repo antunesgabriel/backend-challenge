@@ -5,7 +5,10 @@ import * as cpf from '@fnando/cpf';
 import { ClientsRepository } from './clients.repository';
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dto/create-client.dto';
-import { InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { Client } from './entities/client.entity';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { UpdateResult } from 'typeorm';
@@ -75,6 +78,38 @@ describe('ClientsService', () => {
   });
 
   describe('create()', () => {
+    it('should be throw if email is invalid', async () => {
+      const mockCreateDto = mockCreateClientDto();
+
+      mockCreateDto.email = '';
+
+      await expect(service.create(mockCreateDto)).rejects.toThrow(
+        new BadRequestException({ message: 'Invalid email' }),
+      );
+    });
+
+    it('should be not throw if email is valid', async () => {
+      const mockCreateDto = mockCreateClientDto();
+
+      await expect(service.create(mockCreateDto)).resolves.not.toThrow();
+    });
+
+    it('should be throw if document is invalid', async () => {
+      const mockCreateDto = mockCreateClientDto();
+
+      mockCreateDto.document = '';
+
+      await expect(service.create(mockCreateDto)).rejects.toThrow(
+        new BadRequestException({ message: 'Invalid document' }),
+      );
+    });
+
+    it('should be not throw if document is valid', async () => {
+      const mockCreateDto = mockCreateClientDto();
+
+      await expect(service.create(mockCreateDto)).resolves.not.toThrow();
+    });
+
     it('should be throw if repository throw', async () => {
       repository.createClient = jest
         .fn()
@@ -82,9 +117,7 @@ describe('ClientsService', () => {
 
       const mockCreateInvalidDto: any = {};
 
-      await expect(service.create(mockCreateInvalidDto)).rejects.toThrow(
-        new InternalServerErrorException(),
-      );
+      await expect(service.create(mockCreateInvalidDto)).rejects.toThrow();
     });
 
     it('should be not throw if repository returns', async () => {
@@ -111,14 +144,55 @@ describe('ClientsService', () => {
   });
 
   describe('update()', () => {
+    it('should be throw if received invalid email', async () => {
+      const mockUpdateDto = mockUpdateClientDto();
+
+      const id = faker.datatype.number();
+
+      mockUpdateDto.email = faker.name.firstName();
+
+      await expect(service.update(id, mockUpdateDto)).rejects.toThrow(
+        new BadRequestException({ message: 'Invalid email' }),
+      );
+    });
+
+    it('should be not throw if received valid email', async () => {
+      const mockUpdateDto = mockUpdateClientDto();
+
+      const id = faker.datatype.number();
+
+      await expect(service.update(id, mockUpdateDto)).resolves.not.toThrow();
+    });
+
+    it('should be throw if received invalid document', async () => {
+      const mockUpdateDto = mockUpdateClientDto();
+
+      const id = faker.datatype.number();
+
+      mockUpdateDto.document = faker.datatype.number().toString();
+
+      await expect(service.update(id, mockUpdateDto)).rejects.toThrow(
+        new BadRequestException({ message: 'Invalid document' }),
+      );
+    });
+
+    it('should be not throw if received valid document', async () => {
+      const mockUpdateDto = mockUpdateClientDto();
+
+      const id = faker.datatype.number();
+
+      await expect(service.update(id, mockUpdateDto)).resolves.not.toThrow();
+    });
+
     it('should be throw if repository throw', async () => {
       repository.update = jest
         .fn()
         .mockRejectedValue(new InternalServerErrorException());
 
-      const mockUpdateInvalidDto: any = {};
+      const mockUpdateDto = mockUpdateClientDto();
+      const id = faker.datatype.number();
 
-      await expect(service.update(0, mockUpdateInvalidDto)).rejects.toThrow(
+      await expect(service.update(id, mockUpdateDto)).rejects.toThrow(
         new InternalServerErrorException(),
       );
     });
