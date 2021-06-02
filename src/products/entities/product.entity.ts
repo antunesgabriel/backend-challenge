@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-enum Fabrication {
+export enum Fabrication {
   NATIONAL = 'National',
   IMPORTED = 'Imported',
 }

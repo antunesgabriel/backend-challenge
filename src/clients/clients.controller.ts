@@ -7,6 +7,7 @@ import {
   Delete,
   Put,
 } from '@nestjs/common';
+import { ApiBody } from '@nestjs/swagger';
 import { BaseController } from '../shared/class/base.controller';
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dto/create-client.dto';
@@ -19,6 +20,7 @@ export class ClientsController extends BaseController {
   }
 
   @Post()
+  @ApiBody({ type: CreateClientDto })
   async create(@Body() createClientDto: CreateClientDto) {
     try {
       const data = await this.clientsService.create(createClientDto);
@@ -52,6 +54,7 @@ export class ClientsController extends BaseController {
   }
 
   @Put(':id')
+  @ApiBody({ type: UpdateClientDto })
   async update(
     @Param('id') id: string,
     @Body() updateClientDto: UpdateClientDto,
