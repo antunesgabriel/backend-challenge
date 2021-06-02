@@ -49,7 +49,7 @@ $ curl http://localhost:3333
 // Hello World!
 ```
 
-> [Check de endpoints wiki]()
+- Check API documentation in http://localhost:3333/docs
 
 <br />
 
