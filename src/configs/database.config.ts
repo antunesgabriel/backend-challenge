@@ -1,4 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { Client } from 'src/clients/entities/client.entity';
 
 export const databaseConfig: TypeOrmModuleOptions = {
   type: 'postgres',
@@ -8,5 +9,5 @@ export const databaseConfig: TypeOrmModuleOptions = {
   database: process.env.DB_DATABASE_NAME,
   synchronize: true,
   host: 'postgres',
-  entities: [],
+  entities: [Client],
 };

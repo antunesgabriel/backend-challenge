@@ -5,13 +5,12 @@ services:
     container_name: nest
     build:
       context: .
-      target: development
+      target: ${APP_ENV}
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     ports:
       - ${SERVER_PORT}:3000
-    command: npm run start:dev
     env_file:
       - .env
     networks:
@@ -35,5 +34,3 @@ services:
       - './docker/data/pg:/var/lib/postgresql/data'
 networks:
   webnet:
-volumes:
-  pgdata:

@@ -1,4 +1,4 @@
-FROM node:12.20-alpine As development
+FROM node:lts As development
 
 WORKDIR /usr/src/app
 
@@ -8,9 +8,23 @@ RUN npm i
 
 COPY . .
 
+CMD ["npm", "run", "start:dev"]
 EXPOSE 3000
 
-FROM node:12.20-alpine as production
+FROM node:lts As testing
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm i
+
+COPY . .
+
+CMD ["npm", "run", "test:watch"]
+EXPOSE 3000
+
+FROM node:lts as production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
