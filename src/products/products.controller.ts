@@ -8,20 +8,20 @@ import {
   Put,
 } from '@nestjs/common';
 import { BaseController } from '../shared/class/base.controller';
-import { ClientsService } from './clients.service';
-import { CreateClientDto } from './dto/create-client.dto';
-import { UpdateClientDto } from './dto/update-client.dto';
+import { ProductsService } from './products.service';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
-@Controller('clients')
-export class ClientsController extends BaseController {
-  constructor(private readonly clientsService: ClientsService) {
+@Controller('products')
+export class ProductsController extends BaseController {
+  constructor(private readonly productsService: ProductsService) {
     super();
   }
 
   @Post()
-  async create(@Body() createClientDto: CreateClientDto) {
+  async create(@Body() createProductDto: CreateProductDto) {
     try {
-      const data = await this.clientsService.create(createClientDto);
+      const data = await this.productsService.create(createProductDto);
 
       return this.sucessResponse(data, 'Created!');
     } catch (_) {
@@ -32,7 +32,7 @@ export class ClientsController extends BaseController {
   @Get()
   async findAll() {
     try {
-      const data = await this.clientsService.findAll();
+      const data = await this.productsService.findAll();
 
       return this.sucessResponse(data);
     } catch (_) {
@@ -43,21 +43,21 @@ export class ClientsController extends BaseController {
   @Get(':id')
   async findOne(@Param('id') id: string) {
     try {
-      const data = await this.clientsService.findOne(+id);
+      const data = await this.productsService.findOne(+id);
 
       return this.sucessResponse(data);
     } catch (_) {
-      return this.errorResponse('Client not exist', 404);
+      return this.errorResponse('Product not exist', 404);
     }
   }
 
   @Put(':id')
   async update(
     @Param('id') id: string,
-    @Body() updateClientDto: UpdateClientDto,
+    @Body() updateProductDto: UpdateProductDto,
   ) {
     try {
-      const data = await this.clientsService.update(+id, updateClientDto);
+      const data = await this.productsService.update(+id, updateProductDto);
 
       return this.sucessResponse(data, 'Updated!');
     } catch (_) {
@@ -68,7 +68,7 @@ export class ClientsController extends BaseController {
   @Delete(':id')
   async remove(@Param('id') id: string) {
     try {
-      const data = await this.clientsService.remove(+id);
+      const data = await this.productsService.remove(+id);
 
       return this.sucessResponse(data, 'Deleted!');
     } catch (err) {

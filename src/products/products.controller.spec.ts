@@ -1,51 +1,54 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import * as faker from 'faker';
-import * as cpf from '@fnando/cpf';
-
-import { ClientsController } from './clients.controller';
-import { ClientsService } from './clients.service';
-import { CreateClientDto } from './dto/create-client.dto';
-import { Client } from './entities/client.entity';
 import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import * as faker from 'faker';
 import { DeleteResult, UpdateResult } from 'typeorm';
 
-const mockCreateClientDto = (): CreateClientDto => {
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { Product } from './entities/product.entity';
+
+import { ProductsController } from './products.controller';
+import { ProductsService } from './products.service';
+
+const mockCreateProductDto = (): CreateProductDto => {
   return {
-    name: faker.fake('{{name.firstName}} {{name.lastName}}'),
-    document: cpf.generate(true),
-    email: faker.internet.email(),
-    gender: faker.random.arrayElement(['Masculine', 'Feminine']),
+    name: faker.commerce.productName(),
     code: faker.random.alpha({ count: 8 }),
+    fabrication: faker.random.arrayElement(['National', 'Imported']),
+    size: faker.datatype.number(),
+    value: Number(faker.commerce.price().replace(',', '.')),
   };
 };
 
-const mockUpdateClientDto = (): CreateClientDto => {
+const mockUpdateProductDto = (): UpdateProductDto => {
   return {
-    name: faker.fake('{{name.firstName}} {{name.lastName}}'),
-    document: cpf.generate(true),
-    email: faker.internet.email(),
-    gender: faker.random.arrayElement(['Masculine', 'Feminine']),
+    name: faker.commerce.productName(),
     code: faker.random.alpha({ count: 8 }),
+    fabrication: faker.random.arrayElement(['National', 'Imported']),
+    size: faker.datatype.number(),
+    value: Number(faker.commerce.price().replace(',', '.')),
   };
 };
 
-const mockClient = (clientDto: CreateClientDto): Client => {
+const mockProduct = (
+  productDto: CreateProductDto | UpdateProductDto,
+): Product => {
   return {
     id: Math.round(Math.random() * 300 + 1),
-    name: clientDto.name,
-    document: clientDto.document,
-    email: clientDto.email,
-    gender: clientDto.gender,
-    code: clientDto.code,
+    name: productDto.name,
+    code: productDto.code,
+    fabrication: productDto.fabrication,
+    size: productDto.size,
+    value: productDto.value,
   };
 };
 
-describe('ClientsController', () => {
-  let controller: ClientsController;
-  let service: ClientsService;
+describe('ProductsController', () => {
+  let controller: ProductsController;
+  let service: ProductsService;
 
   beforeEach(async () => {
     const mockService = {
@@ -57,17 +60,17 @@ describe('ClientsController', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [ClientsController],
+      controllers: [ProductsController],
       providers: [
         {
-          provide: ClientsService,
+          provide: ProductsService,
           useValue: mockService,
         },
       ],
     }).compile();
 
-    controller = module.get<ClientsController>(ClientsController);
-    service = module.get<ClientsService>(ClientsService);
+    controller = module.get<ProductsController>(ProductsController);
+    service = module.get<ProductsService>(ProductsService);
   });
 
   it('should be defined', () => {
@@ -75,7 +78,7 @@ describe('ClientsController', () => {
   });
 
   describe('create()', () => {
-    it('should be returns client fail if service throw', async () => {
+    it('should be returns product fail if service throw', async () => {
       service.create = jest
         .fn()
         .mockRejectedValue(new InternalServerErrorException());
@@ -92,29 +95,29 @@ describe('ClientsController', () => {
     });
 
     it('should be called service with correct params', async () => {
-      const mockCreateDto = mockCreateClientDto();
+      const mockCreateDto = mockCreateProductDto();
 
       await controller.create(mockCreateDto);
       expect(service.create).toBeCalledWith(mockCreateDto);
     });
 
     it('should be return success data with repository return', async () => {
-      const mockCreateDto = mockCreateClientDto();
-      const client = mockClient(mockCreateDto);
+      const mockCreateDto = mockCreateProductDto();
+      const product = mockProduct(mockCreateDto);
 
-      service.create = jest.fn().mockResolvedValue(client);
+      service.create = jest.fn().mockResolvedValue(product);
 
       const response = await controller.create(mockCreateDto);
 
       expect(response).toEqual({
         message: 'Created!',
-        data: client,
+        data: product,
       });
     });
   });
 
   describe('findAll()', () => {
-    it('should be returns client fail if service throw', async () => {
+    it('should be returns product fail if service throw', async () => {
       service.findAll = jest
         .fn()
         .mockRejectedValue(new InternalServerErrorException());
@@ -134,24 +137,24 @@ describe('ClientsController', () => {
     });
 
     it('should be return success data with repository return', async () => {
-      const clients = [
-        mockClient(mockCreateClientDto()),
-        mockClient(mockCreateClientDto()),
+      const products = [
+        mockProduct(mockCreateProductDto()),
+        mockProduct(mockCreateProductDto()),
       ];
 
-      service.findAll = jest.fn().mockResolvedValue(clients);
+      service.findAll = jest.fn().mockResolvedValue(products);
 
       const response = await controller.findAll();
 
       expect(response).toEqual({
         message: '',
-        data: clients,
+        data: products,
       });
     });
   });
 
   describe('findOne()', () => {
-    it('should be returns client fail if service throw', async () => {
+    it('should be returns product fail if service throw', async () => {
       service.findOne = jest
         .fn()
         .mockRejectedValue(new InternalServerErrorException());
@@ -161,7 +164,7 @@ describe('ClientsController', () => {
       const response = await controller.findOne(id);
 
       await expect(response).toEqual(
-        new BadRequestException('Client not exist'),
+        new BadRequestException('Product not exist'),
       );
     });
 
@@ -174,21 +177,21 @@ describe('ClientsController', () => {
     });
 
     it('should be return success data with repository return', async () => {
-      const client = mockClient(mockCreateClientDto());
+      const product = mockProduct(mockCreateProductDto());
 
-      service.findOne = jest.fn().mockResolvedValue(client);
+      service.findOne = jest.fn().mockResolvedValue(product);
 
-      const response = await controller.findOne(String(client.id));
+      const response = await controller.findOne(String(product.id));
 
       expect(response).toEqual({
         message: '',
-        data: client,
+        data: product,
       });
     });
   });
 
   describe('update()', () => {
-    it('should be returns client fail if service throw', async () => {
+    it('should be returns product fail if service throw', async () => {
       service.update = jest
         .fn()
         .mockRejectedValue(new InternalServerErrorException());
@@ -205,7 +208,7 @@ describe('ClientsController', () => {
     });
 
     it('should be called service with correct params', async () => {
-      const mockUpdateDto = mockUpdateClientDto();
+      const mockUpdateDto = mockUpdateProductDto();
 
       const id = faker.datatype.number().toString();
 
@@ -214,8 +217,8 @@ describe('ClientsController', () => {
     });
 
     it('should be return success data with repository return', async () => {
-      const mockUpdateDto = mockUpdateClientDto();
-      const client = mockClient(mockUpdateDto);
+      const mockUpdateDto = mockUpdateProductDto();
+      const product = mockProduct(mockUpdateDto);
 
       const updateResult = new UpdateResult();
 
@@ -224,7 +227,7 @@ describe('ClientsController', () => {
       service.update = jest.fn().mockResolvedValue(updateResult);
 
       const response = await controller.update(
-        client.id.toString(),
+        product.id.toString(),
         mockUpdateDto,
       );
 
@@ -236,7 +239,7 @@ describe('ClientsController', () => {
   });
 
   describe('remove()', () => {
-    it('should be returns client fail if service throw', async () => {
+    it('should be returns product fail if service throw', async () => {
       service.remove = jest
         .fn()
         .mockRejectedValue(new InternalServerErrorException());
