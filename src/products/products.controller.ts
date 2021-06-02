@@ -7,6 +7,7 @@ import {
   Delete,
   Put,
 } from '@nestjs/common';
+import { ApiBody } from '@nestjs/swagger';
 import { BaseController } from '../shared/class/base.controller';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -19,6 +20,7 @@ export class ProductsController extends BaseController {
   }
 
   @Post()
+  @ApiBody({ type: CreateProductDto })
   async create(@Body() createProductDto: CreateProductDto) {
     try {
       const data = await this.productsService.create(createProductDto);
@@ -52,6 +54,7 @@ export class ProductsController extends BaseController {
   }
 
   @Put(':id')
+  @ApiBody({ type: UpdateProductDto })
   async update(
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
