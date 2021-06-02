@@ -13,7 +13,7 @@ export class Client {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ unique: true })
   code: string;
 
   @Column({ unique: true, width: 25 })
